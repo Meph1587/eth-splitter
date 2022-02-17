@@ -41,6 +41,7 @@ build/Release
 
 # Dependency directories
 node_modules/
+typechain/
 jspm_packages/
 cache/
 artifacts/
