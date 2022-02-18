@@ -43,8 +43,8 @@ contract EthSplitter is Ownable {
     }
 
     // split entire balance of ETH in contract according to distribution
-    // can be called by anyone
-    function distribute() public {
+    // is called by patable fallback
+    function _distribute() internal {
         // contract ETH balance
         uint256 balance = address(this).balance;
 
@@ -58,8 +58,10 @@ contract EthSplitter is Ownable {
         }
     }
 
-    // receive payments
-    fallback() external payable {}
+    // receive payments and split according to distribution
+    fallback() external payable {
+        _distribute();
+    }
 
     // read shares
     function getShares(uint8 index) public view returns (uint256) {

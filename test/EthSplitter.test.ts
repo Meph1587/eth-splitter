@@ -68,20 +68,14 @@ describe('EthSplitter', function () {
     describe('Split Eth', function () {
         it('can split eth correctly', async function () {
 
-            // fund splitter
+            // balances before split
+            let defaultBalance = await ethers.provider.getBalance(recipients[0]);
+
+            // send funds to splitter for distribution
             await dao.sendTransaction({
                 to: splitter.address,
                 value: ethers.utils.parseEther("1.0"), // Sends exactly 1.0 ETH
               });
-            
-            // check funding 
-            expect(await ethers.provider.getBalance(splitter.address)).to.eq(ethers.utils.parseEther("1.0"));
-
-            // balances before split
-            let defaultBalance = await ethers.provider.getBalance(recipients[0]);
-
-            //splits ETH balance among recipients
-            await splitter.distribute();
             
             // splitter is empty
             expect(await ethers.provider.getBalance(splitter.address)).to.eq(ethers.utils.parseEther("0"));
