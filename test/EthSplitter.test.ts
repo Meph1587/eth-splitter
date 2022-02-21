@@ -1,7 +1,7 @@
 import { ethers } from 'hardhat';
 import { BigNumber, Contract, Signer } from 'ethers';
 import { expect } from 'chai';
-import { EthSplitter} from '../typechain';
+import { EthSplitter, ERC20Mock} from '../typechain';
 import * as chain from '../helpers/chain';
 import * as deploy from '../helpers/deploy';
 
@@ -14,6 +14,8 @@ describe('EthSplitter', function () {
     let happyPirate: Signer, happyPirateAddress: string;
     let angryParrot: Signer, angryParrotAddress: string;
 
+    let erc20: ERC20Mock, wethAddress: string;
+
     // contract params
     let recipients;
     let shares;
@@ -21,6 +23,8 @@ describe('EthSplitter', function () {
     let snapshotId: any;
 
     before(async function () {
+
+        await deployMocks();
         await setupSigners();
 
         // split 50/50
@@ -96,6 +100,34 @@ describe('EthSplitter', function () {
 
     });
 
+    describe('Split ERC20', function () {
+        it('can split ERC20 correctly', async function () {
+
+            // fund contract with ERC20 tokens
+            await erc20.mint(splitter.address, chain.tenPow18.mul(2))
+
+            // distribute tokens
+            await splitter.distributeERC20(erc20.address);
+            
+            // splitter is empty
+            expect(await erc20.balanceOf(splitter.address)).to.eq(0);
+
+            // recipients have received ETH
+            expect(
+                await erc20.balanceOf(recipients[0])
+            ).to.eq(
+                chain.tenPow18.mul(1)
+            );
+            expect(
+                await erc20.balanceOf(recipients[1])
+            ).to.eq(
+                chain.tenPow18.mul(1)
+            );
+        });
+
+
+    });
+
     describe('Update Distribution', function () {
 
 
@@ -133,6 +165,13 @@ describe('EthSplitter', function () {
         daoAddress = await dao.getAddress();
         happyPirateAddress = await happyPirate.getAddress();
         angryParrotAddress = await angryParrot.getAddress();
+    }
+
+    async function deployMocks () {
+        erc20 = (await deploy.deployContract('ERC20Mock',[])) as ERC20Mock;
+        wethAddress = erc20.address
+
+        
     }
 
 });

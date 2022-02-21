@@ -2,6 +2,7 @@
 pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract EthSplitter is Ownable {
     address[] recipients;
@@ -44,7 +45,7 @@ contract EthSplitter is Ownable {
 
     // split entire balance of ETH in contract according to distribution
     // is called by patable fallback
-    function _distribute() internal {
+    function _distributeETH() internal {
         // contract ETH balance
         uint256 balance = address(this).balance;
 
@@ -58,9 +59,27 @@ contract EthSplitter is Ownable {
         }
     }
 
+    // split entire balance of ERC20 Token in contract according to distribution
+    // can be called by anyone
+    function distributeERC20(address token) external {
+        // contract ERC20 balance
+        uint256 balance = IERC20(token).balanceOf(address(this));
+
+        if (balance > 0) {
+            // distribute
+            for (uint8 i = 0; i < recipients.length; i++) {
+                uint256 amount = (balance * shares[i]) / TOTAL_SHARES;
+                require(
+                    IERC20(token).transfer(recipients[i], amount),
+                    "Failed to distribute"
+                );
+            }
+        }
+    }
+
     // receive payments and split according to distribution
     fallback() external payable {
-        _distribute();
+        _distributeETH();
     }
 
     // read shares
