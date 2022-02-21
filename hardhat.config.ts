@@ -39,7 +39,7 @@ const cfg: HardhatUserConfig = {
     etherscan: config.etherscan,
 
     abiExporter: {
-        except: ['.*Mock$'],
+        except: ['.*Mock$','.*ERC20*','.*Ownable'],
         clear: true,
         flat: true,
     },
@@ -55,6 +55,8 @@ const cfg: HardhatUserConfig = {
         cache: "./cache",
         artifacts: "./artifacts"
     },
+
+    
 };
 
 export default cfg;

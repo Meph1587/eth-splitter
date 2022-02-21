@@ -46,12 +46,32 @@
   {
     "inputs": [
       {
+        "internalType": "bytes32",
+        "name": "c__0x5531d9b0",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x5531d9b0",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "token",
         "type": "address"
       }
     ],
     "name": "distributeERC20",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "distributeETH",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

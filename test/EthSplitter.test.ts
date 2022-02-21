@@ -81,6 +81,9 @@ describe('EthSplitter', function () {
                 value: ethers.utils.parseEther("1.0"), // Sends exactly 1.0 ETH
               });
             
+            // distribute funds
+            await splitter.distributeETH()
+            
             // splitter is empty
             expect(await ethers.provider.getBalance(splitter.address)).to.eq(ethers.utils.parseEther("0"));
 
