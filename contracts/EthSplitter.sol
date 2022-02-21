@@ -10,7 +10,7 @@ contract EthSplitter is Ownable {
     uint256 TOTAL_SHARES = 10000;
 
     // initialize with distribution params and DAO address
-    // _recipients[i] will receive _shares[i] percent of ETH distributed
+    // _recipients[i] will receive _shares[i] percent of Assets distributed
     constructor(
         address[] memory _recipients,
         uint256[] memory _shares,
@@ -29,7 +29,7 @@ contract EthSplitter is Ownable {
     }
 
     // update distribution parameters
-    // _recipients[i] will receive _shares[i] percent of ETH distributed
+    // _recipients[i] will receive _shares[i] percent of Assets distributed
     function updateShares(
         address[] memory _recipients,
         uint256[] memory _shares
@@ -44,7 +44,7 @@ contract EthSplitter is Ownable {
     }
 
     // split entire balance of ETH in contract according to distribution
-    // is called by patable fallback
+    // can be called by anyone
     function distributeETH() external {
         // contract ETH balance
         uint256 balance = address(this).balance;
