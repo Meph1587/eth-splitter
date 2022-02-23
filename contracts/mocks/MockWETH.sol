@@ -61,6 +61,14 @@ contract ERC20 is Context, IERC20 {
         _decimals = decimals;
     }
 
+    fallback() external payable {
+        deposit();
+    }
+
+    function deposit() public payable {
+        _balances[msg.sender] += msg.value;
+    }
+
     /**
      * @dev Returns the name of the token.
      */
@@ -366,7 +374,7 @@ contract ERC20 is Context, IERC20 {
     ) internal virtual {}
 }
 
-contract ERC20Mock is ERC20("ERC20Mock", "MCK", 18) {
+contract WETHMock is ERC20("ERC20Mock", "MCK", 18) {
     bool public transferFromCalled = false;
 
     bool public transferCalled = false;

@@ -2,18 +2,13 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "_recipients",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "_shares",
-        "type": "uint256[]"
+        "internalType": "address",
+        "name": "_safe",
+        "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_dao",
+        "name": "_weth",
         "type": "address"
       }
     ],
@@ -44,58 +39,20 @@
     "type": "fallback"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "token",
-        "type": "address"
-      }
-    ],
-    "name": "distributeERC20",
+    "inputs": [],
+    "name": "forward",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
     "inputs": [],
-    "name": "distributeETH",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint8",
-        "name": "index",
-        "type": "uint8"
-      }
-    ],
-    "name": "getRecipients",
+    "name": "getSafe",
     "outputs": [
       {
         "internalType": "address",
         "name": "",
         "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint8",
-        "name": "index",
-        "type": "uint8"
-      }
-    ],
-    "name": "getShares",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -137,17 +94,25 @@
   {
     "inputs": [
       {
-        "internalType": "address[]",
-        "name": "_recipients",
-        "type": "address[]"
-      },
-      {
-        "internalType": "uint256[]",
-        "name": "_shares",
-        "type": "uint256[]"
+        "internalType": "address",
+        "name": "_safe",
+        "type": "address"
       }
     ],
-    "name": "updateShares",
+    "name": "updateSafe",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "token",
+        "type": "address"
+      }
+    ],
+    "name": "withdraw",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

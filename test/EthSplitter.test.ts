@@ -1,20 +1,22 @@
 import { ethers } from 'hardhat';
 import { BigNumber, Contract, Signer } from 'ethers';
 import { expect } from 'chai';
-import { EthSplitter, ERC20Mock} from '../typechain';
+import { EthSplitter, WETHMock, GnosisSafeReceiverProxy} from '../typechain';
 import * as chain from '../helpers/chain';
 import * as deploy from '../helpers/deploy';
 
 describe('EthSplitter', function () {
 
     let splitter: EthSplitter;
+    let proxy: GnosisSafeReceiverProxy;
 
     // main characters
     let dao: Signer, daoAddress: string;
     let happyPirate: Signer, happyPirateAddress: string;
     let angryParrot: Signer, angryParrotAddress: string;
 
-    let erc20: ERC20Mock, wethAddress: string;
+    let weth: WETHMock;
+    
 
     // contract params
     let recipients;
@@ -26,10 +28,12 @@ describe('EthSplitter', function () {
 
         await deployMocks();
         await setupSigners();
+        shares = [5000,5000];
+
+        proxy = (await deploy.deployContract('GnosisSafeReceiverProxy',[daoAddress, weth.address])) as GnosisSafeReceiverProxy;
 
         // split 50/50
-        recipients = [angryParrotAddress, happyPirateAddress];
-        shares = [5000,5000];
+        recipients = [angryParrotAddress, proxy.address];
 
         // deploy
         splitter = (await deploy.deployContract('EthSplitter',[recipients, shares, daoAddress])) as EthSplitter;
@@ -81,13 +85,13 @@ describe('EthSplitter', function () {
                 value: ethers.utils.parseEther("1.0"), // Sends exactly 1.0 ETH
               });
             
-            // distribute funds
+            // distribute funds ETH
             await splitter.distributeETH()
             
-            // splitter is empty
+            // splitter is now empty
             expect(await ethers.provider.getBalance(splitter.address)).to.eq(ethers.utils.parseEther("0"));
 
-            // recipients have received ETH
+            // recipients have received ETH 
             expect(
                 await ethers.provider.getBalance(recipients[0])
             ).to.eq(
@@ -96,33 +100,64 @@ describe('EthSplitter', function () {
             expect(
                 await ethers.provider.getBalance(recipients[1])
             ).to.eq(
-                defaultBalance.add(ethers.utils.parseEther("0.5"))
+                ethers.utils.parseEther("0.5")
             );
+
+             // forward weth from proxy to safe
+            await proxy.forward()
+
+            expect(
+                await weth.balanceOf(recipients[1])
+            ).to.eq(
+                0
+            );
+            expect(
+                await weth.balanceOf(daoAddress)
+            ).to.eq(
+                ethers.utils.parseEther("0.5")
+            );
+    
         });
 
 
     });
 
-    describe('Split ERC20', function () {
-        it('can split ERC20 correctly', async function () {
+    describe('Split WETH', function () {
+        it('can split WETH correctly', async function () {
 
-            // fund contract with ERC20 tokens
-            await erc20.mint(splitter.address, chain.tenPow18.mul(2))
+            // fund contract with WETH tokens
+            await weth.mint(splitter.address, chain.tenPow18.mul(2))
 
             // distribute tokens
-            await splitter.distributeERC20(erc20.address);
-            
+            await splitter.distributeERC20(weth.address);
+
+           
             // splitter is empty
-            expect(await erc20.balanceOf(splitter.address)).to.eq(0);
+            expect(await weth.balanceOf(splitter.address)).to.eq(0);
 
             // recipients have received ETH
             expect(
-                await erc20.balanceOf(recipients[0])
+                await weth.balanceOf(recipients[0])
             ).to.eq(
                 chain.tenPow18.mul(1)
             );
             expect(
-                await erc20.balanceOf(recipients[1])
+                await weth.balanceOf(recipients[1])
+            ).to.eq(
+                chain.tenPow18.mul(1)
+            );
+
+            // forward weth from proxy to safe
+            await proxy.forward()
+
+            expect(
+                await weth.balanceOf(recipients[1])
+            ).to.eq(
+                chain.tenPow18.mul(0)
+            );
+
+             expect(
+                await weth.balanceOf(daoAddress)
             ).to.eq(
                 chain.tenPow18.mul(1)
             );
@@ -171,10 +206,7 @@ describe('EthSplitter', function () {
     }
 
     async function deployMocks () {
-        erc20 = (await deploy.deployContract('ERC20Mock',[])) as ERC20Mock;
-        wethAddress = erc20.address
-
-        
+        weth = (await deploy.deployContract('WETHMock',[])) as WETHMock;
     }
 
 });
