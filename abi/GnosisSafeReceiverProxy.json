@@ -39,6 +39,19 @@
     "type": "fallback"
   },
   {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "c__0x08a31b5b",
+        "type": "bytes32"
+      }
+    ],
+    "name": "c_0x08a31b5b",
+    "outputs": [],
+    "stateMutability": "pure",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "forward",
     "outputs": [],
